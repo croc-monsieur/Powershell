@@ -1,0 +1,73 @@
+#Debut
+$ServiceName = Read-Host "`nNom de service:" 
+$ServiceList = @()
+#initialisation des compteurs
+$i=0
+$n=0
+#variable choix
+$Choix=0
+
+#Liste des serices et leur status
+Get-Service -Name $ServiceName | ForEach {
+    $i++
+    $ServiceList+= "[$i] "+ "$($_.Name) $($_.Status)" 
+}
+
+do
+{
+    if ($ServiceList[$n].Contains("Running"))
+    {
+        $color = "green"
+    }
+    else
+    {
+        $color = "red"
+    }
+    Write-Host $ServiceList[$n] -ForegroundColor $color
+    #on passe à l'indice suivant
+    $n++
+} while ($n -lt $i) 
+
+#Choix du service
+$Choix = Read-Host "`nChoix du service: entre 1 et $i" 
+#le temps que le choix n'est pas bon on demande son choix
+while ($Choix -GT $i) 
+{
+    Write-Host "Choix $Choix invalide"
+    $Choix = Read-Host "`nChoix du service: entre 1 et $i" 
+} 
+
+#on découpe le contenue de la variable ServiceList pour obtenir le nom et l'état
+$StartService = $ServiceList[$Choix-1]
+$Etat = $StartService.Split()[2]
+$Nom = $StartService.Split("]")[1].Split()[1]
+
+if ($Etat -eq "stopped")
+{
+    $Choix = Read-Host "`nle service est stoppé, voulez-vous le démarrer? [O/N]" 
+    switch ($Choix)
+    {
+        "O" 
+        {
+            start-service $Nom
+            Write-Host "c'est demarré"
+        } 
+        
+        "N"
+        {
+            "pas de problème maggle"
+        }
+    }
+    
+}
+else
+{
+    write-host "c'est tout bon"
+}
+
+Function Set-popup
+{
+   param([string]$message, [string]$titre)
+   $WshShell = New-Object -ComObject wscript.Shell
+   $WshShell.Popup($message,0,$titre)
+}
