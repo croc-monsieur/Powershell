@@ -1,0 +1,49 @@
+do
+{
+    $Choix = Read-Host "`n`tAD MANAGER (DIM.GOV)`n`n1- Création d'un utilisateur`n2- Création d'une UO`n3- Deplacer un user vers une UO`n4- Sortie`nVotre Choix" 
+    Switch ($Choix) 
+    { 
+        1 
+        {
+            $Prenom = Read-Host "Prénom:"
+            $Nom = Read-Host "Nom:"
+
+            #Création de l'username
+            $UserName = $Prenom+$Nom.subString(0,1)
+            #Création du password de l'utilisateur qu'il devra changer à sa première connexion
+            $Passwd = "Azerty12"
+            #Création d'un password sécurisé
+            $secpasswd = ConvertTo-SecureString -String $Passwd -AsplainText -Force
+
+            #Création de l'user simplement dans le dossier USERS de l'AD avec un password simple qu'il devra changer a sa connexion
+            New-ADUser -Name $UserName -GivenName $Prenom -Surname $Nom -path "CN=Users,DC=dim,DC=gov" -Enabled $True -DisplayName "$Prenom, $Nom" -AccountPassword $secpasswd -ChangePasswordAtLogon $true
+
+            write-output "Utilisateur $UserName créé"
+        } 
+    
+        2 
+        {
+            $NomUO= Read-Host "Nom de l'unité organisationnelle:"
+            New-ADOrganizationalUnit -name $NomUO
+            write-output "Unité Organisationnelle $NomUO créée"
+        }
+
+        3
+        {
+            $NomUO= Read-Host "Nom de l'unité organisationnelle:"
+            $UserName= Read-Host "Nom D'utilisateur (Prenom + première lettre du nom"
+            Write-host "CN=$UserName,CN=Users,DC=dim,DC=gov"
+            Move-ADObject -identity "CN=$UserName,CN=Users,DC=dim,DC=gov" -targetpath "OU=$NomUO,DC=dim,DC=gov"
+        }
+
+        4 
+        {
+            exit
+        }
+        default {
+            write-host "`nJe ne comprends pas votre choix"
+        }
+    }
+    sleep 3
+    clear
+}while($Choix -ne "4")
