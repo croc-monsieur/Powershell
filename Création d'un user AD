@@ -1,0 +1,18 @@
+param (
+    [parameter(Mandatory=$true)] [string] $Prenom,
+    [parameter(Mandatory=$true)] [string] $Nom
+    )
+
+#Création de l'username
+$UserName = $Prenom+$Nom.subString(0,1)
+
+#Création du password de l'utilisateur qu'il devra changer à sa première connexion
+$Passwd = "Azerty12"
+
+#Création d'un password sécurisé
+$secpasswd = ConvertTo-SecureString -String $Passwd -AsplainText -Force
+
+#Création de l'user simplement dans le dossier USERS de l'AD avec un password simple qu'il devra changer a sa connexion
+New-ADUser -Name $UserName -GivenName $Prenom -Surname $Nom -Enabled $True -DisplayName "$Prenom, $Nom" -AccountPassword $secpasswd -ChangePasswordAtLogon $true
+
+write-output "Utilisateur $UserName créé"
