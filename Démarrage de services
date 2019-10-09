@@ -64,10 +64,3 @@ else
 {
     write-host "c'est tout bon"
 }
-
-Function Set-popup
-{
-   param([string]$message, [string]$titre)
-   $WshShell = New-Object -ComObject wscript.Shell
-   $WshShell.Popup($message,0,$titre)
-}
