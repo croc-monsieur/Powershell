@@ -17,15 +17,35 @@ do
 
             #Création de l'user simplement dans le dossier USERS de l'AD avec un password simple qu'il devra changer a sa connexion
             New-ADUser -Name $UserName -GivenName $Prenom -Surname $Nom -path "CN=Users,DC=dim,DC=gov" -Enabled $True -DisplayName "$Prenom, $Nom" -AccountPassword $secpasswd -ChangePasswordAtLogon $true
-
-            write-output "Utilisateur $UserName créé"
+            
+            #Vérification de création
+            $Wok = Get-ADUser $UserName
+            if ($Wok -eq " ")
+            {
+                write-output "Problème lors de la création"
+            }
+            else
+            {
+                write-output "Utilisateur $UserName créé"
+            }
+            
         } 
     
         2 
         {
             $NomUO= Read-Host "Nom de l'unité organisationnelle:"
             New-ADOrganizationalUnit -name $NomUO
-            write-output "Unité Organisationnelle $NomUO créée"
+
+            #Vérification de création
+            $Wok = Get-ADOrganizationalUnit -Filter 'Name -like "$NomUO"'
+            if ($Wok -eq " ")
+            {
+                write-output "Problème lors de la création"
+            }
+            else
+            {
+                write-output "Unité Organisationnelle $NomUO créée"
+            }
         }
 
         3
